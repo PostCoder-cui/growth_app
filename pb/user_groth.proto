@@ -1,0 +1,183 @@
+syntax = "proto3";
+
+option go_package = "user_growth/pb";
+
+package UserGrowth;
+
+import "google/api/annotations.proto";
+
+
+//用户积分服务
+service UserCoin {
+    //积分任务列表
+    rpc ListTasks (ListTasksRequest) returns (ListTasksReply) {
+        option (google.api.http) = {
+            get: "/v1/listtasks"
+        };
+    }
+    //获取用户积分信息
+    rpc UserCoinInfo (UserCoinInfoRequest) returns (UserCoinInfoReply);
+    //获取用户积分明细列表
+    rpc UserCoinDetails (UserCoinDetailsRequest) returns (UserCoinDetailsReply);
+    //调整用户积分：奖励惩罚都是这个接口
+    rpc UserCoinChange (UserCoinChangeRequest) returns (UserCoinChangeReply) {
+        option (google.api.http) = {
+            post: "/v1/changeCoin"
+            body: "*"
+        };
+    };
+}
+
+//用户等级信息
+service UserGrade {
+    //获取所有等级信息列表
+    rpc ListGrades (ListGradesRequest) returns (ListGradesReply) {
+        option (google.api.http) = {
+            get: "/v1/ListGrades"
+        };
+    };
+    //获取等级的特权列表
+    rpc ListGradePrivilege (ListGradePrivilegeRequest) returns (ListGradePrivilegeReply);
+    //检查用户是否拥有某个产品特权
+    rpc CheckUserPrivilege (CheckUserPrivilegeRequest) returns (CheckUserPrivilegeReply);
+    //获取用户等级信息
+    rpc UserGradeInfo (UserGradeInfoRequest) returns (UserGradeInfoReply);
+    //调整用户等级成长值
+    rpc UserGradeChange (UserGradeChangeRequest) returns (UserGradeChangeReply);
+}
+// Messages for UserCoin service
+message ListTasksRequest {}
+message ListTasksReply {
+    repeated TbCoinTask dataList = 1;
+}
+
+message UserCoinInfoRequest {
+    int32 uid = 1;
+}
+message UserCoinInfoReply {
+    TbCoinUser data = 1;
+}
+
+message UserCoinDetailsRequest {
+    int32 uid = 1;
+    int32 page = 2;
+    int32 size = 3;
+}
+message UserCoinDetailsReply {
+    repeated TbCoinDetail dataList = 1;
+    int32 total = 2;
+}
+
+message UserCoinChangeRequest {
+    int32 uid = 1;
+    string task_name = 2; //为什么不用task_id，因为认为u名称更好记住
+    int32 coin = 3;
+}
+message UserCoinChangeReply {
+    TbCoinUser user = 1;
+}
+
+// Messages for UserGrade service
+message ListGradesRequest {}
+message ListGradesReply {
+    repeated TbGradeInfo dataList = 1;
+}
+
+message ListGradePrivilegeRequest {
+    int32 grade_id = 1;
+}
+message ListGradePrivilegeReply {
+    repeated TbGradePrivilege dataList = 1;
+}
+
+message CheckUserPrivilegeRequest {
+    int32 uid = 1;
+    string product = 2;
+    string function = 3;
+}
+message CheckUserPrivilegeReply {
+    bool data = 1;
+}
+
+message UserGradeInfoRequest {
+    int32 uid = 1;
+}
+message UserGradeInfoReply {
+    TbGradeInfo data = 1;
+}
+
+message UserGradeChangeRequest {
+    int32 uid = 1;
+    int32 score = 2;
+}
+message UserGradeChangeReply {
+    TbGradeUser data = 1;
+}
+
+//数据库模型
+// tb_coin_detail
+message TbCoinDetail {//积分明细表
+    int32 id = 1;
+    int32 uid = 2;
+    int32 task_id = 3;
+    int32 coin = 4;
+    string sys_created = 5;
+    string sys_update = 6;
+}
+
+
+// tb_coin_task
+message TbCoinTask {
+    int32 id = 1;
+    string task = 2;
+    int32 coin = 3;
+    int32 limit = 4;
+    string start = 5;
+    string sys_created = 6;
+    string sys_updated = 7;
+    int32 sys_status = 8;
+}
+
+// tb_coin_user
+message TbCoinUser {
+    int32 id = 1;
+    int32 uid = 2;
+    int32 coins = 3;
+    string sys_created = 4;
+    string sys_updated = 5;
+}
+
+// tb_grade_info
+message TbGradeInfo {
+    int32 id = 1;
+    string title = 2;
+    string description = 3;
+    int32 score = 4;
+    int32 expired = 5;
+    string sys_created = 6;
+    string sys_updated = 7;
+}
+
+// tb_grade_privilege
+message TbGradePrivilege {
+    int32 id = 1;
+    int32 grade_id = 2;
+    string product = 3;
+    string function = 4;
+    string description = 5;
+    int32 expired = 6;
+    string sys_created = 7;
+    string sys_updated = 8;
+    int32 sys_status = 9;
+}
+
+// tb_grade_user
+message TbGradeUser {
+    int32 id = 1;
+    int32 uid = 2;
+    int32 grade_id = 3;
+    string expired = 4;
+    int32 score = 5;
+    string sys_created = 6;
+    string sys_updated = 7;
+}

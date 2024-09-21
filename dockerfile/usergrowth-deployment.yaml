@@ -1,0 +1,24 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: growthv16
+  namespace: growth-v16
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: growthv16
+  template:
+    metadata:
+      labels:
+        app: growthv16
+    spec:
+      containers:
+        - name: growthv16
+          image: 192.168.137.151:5000/growth_application:v1.6
+          ports:
+            - containerPort: 8085
+            - containerPort: 8080
+          env:
+            - name: EXAMPLE_VAR
+              value: "example_value"
