@@ -12,7 +12,7 @@ import (
 
 func main() {
 	//链接到服务器
-	addr := flag.String("addr", "192.168.137.151:8085", "server address")
+	addr := flag.String("addr", "0.0.0.0:8085", "server address")
 	conn, err := grpc.NewClient(*addr, grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
 		log.Fatalf("fail to connect server: %v", err)
